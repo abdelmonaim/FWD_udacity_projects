@@ -91,12 +91,13 @@ GET '/categories'
 ## Error Handling
 
 Errors are returned as JSON objects in the below format:
-
+```
 {
   'success': False,
   'error': 400,
   'message': "bad request"
 }
+```
 The API will return four error types when requests fail:
 - 400: Bad Request
 - 404: Resource Not Found
