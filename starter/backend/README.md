@@ -88,8 +88,204 @@ GET '/categories'
 '6' : "Sports"}
 
 ```
+## Error Handling
 
+Errors are returned as JSON objects in the below format:
 
+{
+  'success': False,
+  'error': 400,
+  'message': "bad request"
+}
+The API will return four error types when requests fail:
+- 400: Bad Request
+- 404: Resource Not Found
+- 405: Method Not Allowed
+- 422: Not Proccessable
+
+## End Points
+
+GET '/categoires'
+- General:
+	- Input:
+		+ Method type : 'GET'
+		+ Arguments : None
+	- Returns:
+		+ Dictionary with available categories.
+		+ Intergar for total number of available categories.
+		+ Success MSG.
+- Sample request:
+	- curl -X GET http://127.0.0.1:5000/categories.
+- Result:
+```
+{
+  "all_categories": 6, 
+  "categories": {
+    "1": "Science", 
+    "2": "Art", 
+    "3": "Geography", 
+    "4": "History", 
+    "5": "Entertainment", 
+    "6": "Sports"
+  }, 
+  "success": true
+}
+```
+
+GET  '/questions'
+- General:
+	- Input:
+		+ Method type : 'GET'
+		+ Arguments : None
+	- Returns:
+		+ List of pagenated dictionaries of questions object, each containing the question, the answer, diffcuilty and category
+		+ List of dictioneries of categories.
+		+ Intergar for total number of available questions.
+		+ Success MSG.
+- Sample:
+	- curl -X GET http://127.0.0.1:5000/questions
+- Result:
+```
+{
+  "categories": [
+    "Science", 
+    "Art", 
+    "Geography", 
+    "History", 
+    "Entertainment", 
+    "Sports"
+  ], 
+  "current_category": "All", 
+  "questions": [
+    {
+      "answer": "Apollo 13", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 2, 
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    }, 
+    .............., 
+    {
+      "answer": "The Palace of Versailles", 
+      "category": 3, 
+      "difficulty": 3, 
+      "id": 14, 
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    }
+  ], 
+  "success": true, 
+  "total_questions": 22
+}
+
+```
+
+DELETE '/questions/<int:question_id>'  
+- General:
+	- Input:
+		+ Method type : 'DELETE'
+		+ Arguments : <int:question ID>
+	- Returns:
+		+ Used to delete a question frm database by its ID
+		+ Integer ID for deleted question.
+		+ Success MSG.
+- Sample:
+	- curl -X DELETE http://127.0.0.1:5000/questions/1
+- Result:
+```{
+  "answer": "this is answer 0.", 
+  "question": "this is question 0?", 
+  "success": true, 
+  "total_number_of_questions": 24
+}
+
+{
+  "deleted": 10, 
+  "success": true
+}
+
+```
+
+POST '/questions'  
+- General:
+	- Input:
+		+ Method type : POST
+		+ Arguments : dictionary with question, answer, category, difficulty
+	- Returns:
+		+ Added question, added answer.
+		+ Total number of question after addition.
+		+ Success MSG
+- Sample:
+	- curl -X POST -H "Content-Type: application/json" -d '{"question":"this is question 0?","answer":"this is answer 0.","difficulty":1,"category":1}' http://127.0.0.1:5000/books
+- Result:
+```
+{
+  "answer": "this is answer 0.", 
+  "question": "this is question 0?", 
+  "success": true, 
+  "total_number_of_questions": 24
+}
+```
+
+GET  '/categories/<int:category_id>/questions'
+- General:
+	- Input:
+		+ Method type : GET
+		+ Arguments : Category ID
+	- Returns:
+		+ List of dictionaries of questions.
+		+ Success MSG
+- Sample:
+	- curl -X GET http://127.0.0.1:5000/categories/1/questions
+- Result:
+```
+{
+  "questions": [
+    {
+      "answer": "The Liver", 
+      "category": 1, 
+      "difficulty": 4, 
+      "id": 20, 
+      "question": "What is the heaviest organ in the human body?"
+    }, 
+    ............................
+    {
+      "answer": "this is answer 0.", 
+      "category": 1, 
+      "difficulty": 1, 
+      "id": 29, 
+      "question": "this is question 0?"
+    }
+  ], 
+  "success": true
+}
+
+```
+
+POST '/quizzes'  
+- General:
+	- Input:
+		+ Method type : POST
+		+ Arguments : 
+			- List of previous questions in current hand.
+			- Specific category for current hand.
+	- Returns:
+		+ Question to be played, (not present in previous questions list)
+		+ Success MSG.
+- Sample:
+	- curl -X POST -H "Content-Type: application/json" -d '{"previous_questions":[],"quiz_category":{"type":"Science","id":"1"}}' http://127.0.0.1:5000/quizzes
+- Result:
+```
+{
+  "question": {
+    "answer": "The Liver", 
+    "category": 1, 
+    "difficulty": 4, 
+    "id": 20, 
+    "question": "What is the heaviest organ in the human body?"
+  }, 
+  "success": true
+}
+```
 ## Testing
 To run the tests, run
 ```
