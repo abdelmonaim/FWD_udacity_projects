@@ -189,6 +189,7 @@ def create_app(test_config=None):
         force_end = False
         body = request.get_json()
         category_id = int(body.get('quiz_category')['id'])
+
         # print('Selected category is: ' + str(category_id))
 
         if category_id == 0:
@@ -196,6 +197,9 @@ def create_app(test_config=None):
         else:
             all_questions = Question.query.filter(
                 Question.category == category_id)
+
+        if category_id > len(Category.query.all()):
+            abort(404)
         # print('Questions before formatting: ')
         # print(all_questions)
 

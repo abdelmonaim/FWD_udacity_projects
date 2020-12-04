@@ -62,12 +62,10 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 422)
 
     def test_search_function(self):
-        res = self.client().post('/questions', json={'searchTerm': 'team'})
+        res = self.client().post('/questions', json={'searchTerm': 'w'})
         data = json.loads(res.data)
-        #print('testing search function!!!!!!')
-        #print(data['questions'])
         self.assertEqual(res.status_code, 200)
-        self.assertTrue('team' in data['questions'][0]['question'])
+        self.assertTrue('w' in data['questions'][0]['question'])
 
     def test_get_all_categories(self):
         res = self.client().get('/categories')
@@ -99,6 +97,25 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
+
+    def test_playing(self):
+        res = self.client().post('/quizzes',
+                                 json={'previous_questions': [],
+                                       'quiz_category': {'id': 1,
+                                                         'type': 'Science'}})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+
+    def test_playing_with_wrong_parameters(self):
+        res = self.client().post('/quizzes',
+                                 json={'previous_questions': [],
+                                       'quiz_category': {'id': 10,
+                                                         'type': 'Science'}})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
