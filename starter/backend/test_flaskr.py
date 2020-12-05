@@ -64,8 +64,15 @@ class TriviaTestCase(unittest.TestCase):
     def test_search_function(self):
         res = self.client().post('/questions', json={'searchTerm': 'w'})
         data = json.loads(res.data)
+
         self.assertEqual(res.status_code, 200)
         self.assertTrue('w' in data['questions'][0]['question'])
+
+    def test_search_function_not_working(self):
+        res = self.client().post('/questions', json={'searchTerm': 'sadfasd'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
 
     def test_get_all_categories(self):
         res = self.client().get('/categories')
@@ -73,6 +80,12 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertTrue(len(data['categories']))
+
+    def test_get_all_categories_not_working(self):
+        res = self.client().get('/categories')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
 
     def test_get_questions_by_page_in_range(self):
         res = self.client().get('/questions?page=2')
@@ -97,6 +110,12 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
+
+    def test_get_questions_by_category_not_working(self):
+        res = self.client().get('/categories/10/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
 
     def test_playing(self):
         res = self.client().post('/quizzes',

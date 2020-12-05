@@ -75,8 +75,8 @@ def create_app(test_config=None):
 
         all_categories = Category.query.order_by(Category.id).all()
         categories = [category.format() for category in all_categories]
-        cate = [cat['type'] for cat in categories]
-
+        # cate = [cat['type'] for cat in categories]
+        # print(cate)
         if len(current_questions_view) == 0:
             abort(404)
 
@@ -84,10 +84,33 @@ def create_app(test_config=None):
             'success': True,
             'questions': current_questions_view,
             'total_questions': len(Question.query.all()),
-            'current_category': "All",
-            'categories': cate
+            'current_category': None,
+            'categories': {category.id: category.type
+                           for category in all_categories}
         })
 
+    '''
+
+    @app.route('/questions', methods=['GET'])
+    def get_questions():
+        categories=[]
+        temp_list=[]
+        questions=Question.query.all()
+        current_question=paginate_questions(request,questions)
+        for cat_id in current_question:
+            category=Category.query.get(cat_id['category'])
+            if not(cat_id['category'] in temp_list):
+                categories.append(category.type)
+            temp_list.append(cat_id['category'])
+        print(categories)
+        return jsonify({
+            'success': True,
+            'question': current_question,
+            'total_questions': len(current_question),
+            'category': categories# ['Science', 'Art', 'Geography', 'History', 'Entertainment', 'Sports']
+        })
+        
+    '''
     ''' @TODO: Create an endpoint to DELETE question using a question_ID.
     TEST: When you click the trash icon next to a question,
     the question will be removed.
@@ -121,7 +144,7 @@ def create_app(test_config=None):
     that string within their question. Try using the word "title" to start.'''
 
     @app.route('/questions', methods=['POST'])
-    def create_question():
+    def create_search_question():
         body = request.get_json()
         new_question = body.get('question', None)
         new_answer = body.get('answer', None)
@@ -132,6 +155,11 @@ def create_app(test_config=None):
             if search:
                 search_query = Question.query.filter(
                     Question.question.ilike('%{}%'.format(search)))
+                # print('Total number of entities found using search term: ' + str(search_query.count()))
+                if search_query.count() == 0:
+                    # print('Inside of the abort condition.')
+                    abort(422)
+                # print('Out of the abort condition')
                 search_query_formatted = [query_formatted.format()
                                           for query_formatted in search_query]
                 return jsonify({
@@ -142,7 +170,7 @@ def create_app(test_config=None):
             else:
                 if len(new_question) == 0 or len(new_answer) == 0 or int(
                         new_category) <= 0 or int(new_score) < 0 or int(
-                        new_score) > 5:
+                    new_score) > 5:
                     abort(422)
                 question = Question(question=new_question,
                                     answer=new_answer,
@@ -166,9 +194,12 @@ def create_app(test_config=None):
     @app.route('/categories/<int:category_id>/questions', methods=['GET'])
     def get_questions_by_category(category_id):
         questions = Question.query.filter(
-            Question.category == category_id + 1)
+            Question.category == category_id)
+        if Category.query.filter(Category.id == category_id) \
+                .one_or_none() is None:
+            abort(404)
         current_questions_view = paginate_questions(request, questions)
-        print(current_questions_view)
+        # print(current_questions_view)
         return jsonify({
             'success': True,
             'questions': current_questions_view,
